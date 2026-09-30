@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import '../styles/desktop.css';
+import Desktop from '../components/desktop/Desktop';
+import { loadPortfolioData } from '../lib/data';
+import { site } from '../config/site';
+import { withBase } from '../lib/url';
+
+const data = await loadPortfolioData();
+const bootSkip = `try{var s=location.search;if(!/[?&]boot/.test(s)&&(sessionStorage.getItem('luna.booted')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches||/[?&](app|mode)=/.test(s)||navigator.webdriver))document.documentElement.dataset.booted='1'}catch(e){}`;
+---
+
+<Base bodyClass="desktop">
+  <Fragment slot="head">
+    <script is:inline set:html={bootSkip} />
+    <noscript>
+      <style>
+        .boot {
+          display: none !important;
+        }
+        html,
+        body {
+          overflow: auto !important;
+        }
+        .shell-root {
+          position: static !important;
+        }
+      </style>
+    </noscript>
+  </Fragment>
+  <Desktop client:load data={data} />
+  <noscript>
+    <section class="noscript pad">
+      <h1>
+        {site.name}: {site.title}
+      </h1>
+      <p>{site.tagline}</p>
+      <p>This desktop needs JavaScript, but everything is also available as plain pages:</p>
+      <ul>
+        <li>
+          <a href={withBase('projects/')}>Projects</a>
+        </li>
+        <li>
+          <a href={withBase('blog/')}>Blog</a>
+        </li>
+        <li>
+          <a href={withBase('resume/')}>Résumé</a>
+        </li>
+        <li>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+        </li>
+      </ul>
+    </section>
+  </noscript>
+</Base>

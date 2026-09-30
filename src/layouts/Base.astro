@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import { site } from '../config/site';
+import { themesCss, themes, DEFAULT_THEME, THEME_STORAGE_KEY, themeIds } from '../lib/themes';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Path under /og/ (without extension) for the social card. */
+  og?: string;
+  bodyClass?: string;
+}
+
+const { title, description = site.tagline, og = 'default', bodyClass } = Astro.props;
+const fullTitle = title ? `${title} · ${site.handle}` : `${site.handle} · ${site.title}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(withBase(`og/${og}.png`), Astro.site);
+const bootstrap = `(()=>{try{var k=${JSON.stringify(THEME_STORAGE_KEY)},ids=${JSON.stringify(themeIds)},t=localStorage.getItem(k);if(!t||ids.indexOf(t)<0){t=${JSON.stringify(DEFAULT_THEME)}}document.documentElement.dataset.theme=t}catch(e){}})();`;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  alternateName: site.handle,
+  jobTitle: site.title,
+  url: Astro.site?.toString(),
+  sameAs: site.links.filter((l) => l.href.startsWith('http')).map((l) => l.href),
+};
+---
+
+<!doctype html>
+<html lang="en" data-theme={DEFAULT_THEME}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.name} />
+    <meta name="theme-color" content={themes[DEFAULT_THEME].palette.bg} />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    <link rel="alternate" type="application/rss+xml" title={`${site.handle} devlog`} href={withBase('rss.xml')} />
+    <link rel="sitemap" href={withBase('sitemap-index.xml')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script is:inline set:html={bootstrap} />
+    <style is:inline set:html={themesCss()} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <slot />
+  </body>
+</html>

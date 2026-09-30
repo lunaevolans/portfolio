@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import '../styles/page.css';
+import { withBase } from '../lib/url';
+---
+
+<Base title="404: kernel panic" description="Page not found.">
+  <main class="panic mono">
+    <p class="red">Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(404,0)</p>
+    <p>CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.18.4-ba1.fc42.x86_64</p>
+    <p>Call Trace:</p>
+    <p>&nbsp;&lt;TASK&gt;</p>
+    <p>&nbsp;dump_stack_lvl+0x47/0x60</p>
+    <p>&nbsp;panic+0x1a3/0x3d0</p>
+    <p>&nbsp;mount_root_generic+0x404/0x404</p>
+    <p>
+      &nbsp;resolve_path+0xdead/0xbeef <span class="red">[path_not_found]</span>
+    </p>
+    <p>&nbsp;&lt;/TASK&gt;</p>
+    <p class="red">---[ end Kernel panic - the page you requested does not exist ]---</p>
+    <p class="hint">
+      Press <a href={withBase('')}>Enter</a> to reboot into the desktop, or run <a href={withBase('?mode=tty')}>a shell</a>.
+    </p>
+  </main>
+  <script is:inline>
+    addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') location.href = document.querySelector('.hint a').href;
+    });
+  </script>
+  <style>
+    .panic {
+      min-height: 100vh;
+      padding: 24px;
+      background: #000;
+      color: #ddd;
+      font-size: 0.85rem;
+    }
+    .panic p {
+      margin: 0 0 2px;
+    }
+    .red {
+      color: #ff5f5f;
+    }
+    .hint {
+      margin-top: 24px !important;
+      color: #fff;
+    }
+    .hint a {
+      color: #5fd7ff;
+    }
+  </style>
+</Base>
