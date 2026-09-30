@@ -1,0 +1,251 @@
+---
+import Page from '../layouts/Page.astro';
+import { getCollection } from 'astro:content';
+import { site, skills } from '../config/site';
+import { withBase } from '../lib/url';
+
+const experience = (await getCollection('experience')).map((e) => e.data).sort((a, b) => b.start.localeCompare(a.start));
+const projects = (await getCollection('projects')).filter((p) => p.data.featured).sort((a, b) => a.data.order - b.data.order);
+const fmt = (ym: string | null) =>
+  ym ? new Date(`${ym}-01T00:00:00Z`).toLocaleDateString('en', { month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'Present';
+---
+
+<Page title="Résumé" description={`${site.name}: ${site.title}`}>
+  <script is:inline>
+    if (/[?&]embed=1/.test(location.search)) document.documentElement.classList.add('embed');
+  </script>
+  <article class="resume">
+    <header class="r-head">
+      <div>
+        <h1>{site.name}</h1>
+        <p class="r-title">{site.title}</p>
+      </div>
+      <ul class="r-contact mono">
+        <li>{site.location}</li>
+        <li>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+        </li>
+        <li>
+          <a href={`https://github.com/${site.github}`}>github.com/{site.github}</a>
+        </li>
+        <li>
+          <a href={Astro.site?.toString()}>{Astro.site?.host}</a>
+        </li>
+      </ul>
+    </header>
+
+    <section>
+      <h2>Summary</h2>
+      {site.bio.map((b) => (
+        <p>{b}</p>
+      ))}
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      {experience.map((e) => (
+        <div class="r-job">
+          <div class="r-job-head">
+            <h3>
+              {e.role} · <span>{e.company}</span>
+            </h3>
+            <p class="mono">
+              {fmt(e.start)} – {fmt(e.end)} · {e.location}
+            </p>
+          </div>
+          <ul>
+            {e.highlights.map((h) => (
+              <li>{h}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Selected projects</h2>
+      <ul class="r-projects">
+        {projects.map((p) => (
+          <li>
+            <b>{p.data.title}</b>: {p.data.summary} <span class="mono muted">({p.data.stack.slice(0, 4).join(', ')})</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Skills</h2>
+      <dl class="r-skills">
+        {skills.map((g) => (
+          <div>
+            <dt>{g.group}</dt>
+            <dd>{g.items.map((i) => i.name).join(' · ')}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  </article>
+  <p class="cta-row no-print">
+    <a class="btn primary" href={withBase('resume.pdf')} download>
+      Download PDF
+    </a>
+    <button class="btn" type="button" onclick="print()">
+      Print
+    </button>
+  </p>
+</Page>
+
+<style is:global>
+  .resume {
+    padding: 36px 40px;
+    border-radius: 14px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    box-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.6);
+  }
+  .r-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--c-accent);
+  }
+  .resume h1 {
+    margin: 0;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+  }
+  .r-title {
+    margin: 2px 0 0;
+    color: var(--c-accent);
+    font-weight: 600;
+  }
+  .r-contact {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.8rem;
+    text-align: right;
+  }
+  .resume section {
+    margin-top: 20px;
+  }
+  .resume h2 {
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--c-accent2);
+  }
+  .resume p,
+  .resume li {
+    font-size: 0.92rem;
+  }
+  .r-job {
+    margin-bottom: 14px;
+    break-inside: avoid;
+  }
+  .r-job-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 12px;
+  }
+  .r-job h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+  .r-job h3 span {
+    color: var(--c-muted);
+    font-weight: 500;
+  }
+  .r-job-head p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--c-muted);
+  }
+  .r-job ul,
+  .r-projects {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  .r-skills {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+  }
+  .r-skills div {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+  .r-skills dt {
+    font-weight: 700;
+  }
+  .r-skills dd {
+    margin: 0;
+    color: var(--c-muted);
+  }
+  html.embed .page-bar,
+  html.embed .page-foot,
+  html.embed .cta-row,
+  html.embed .skip-link {
+    display: none;
+  }
+  html.embed body.page {
+    background: transparent;
+  }
+  html.embed .page-main {
+    padding: 16px;
+  }
+  @media (max-width: 600px) {
+    .resume {
+      padding: 20px 18px;
+    }
+    .r-contact {
+      text-align: left;
+    }
+    .r-skills div {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+    html,
+    body.page {
+      background: #fff !important;
+      color: #111 !important;
+      --c-fg: #111;
+      --c-muted: #444;
+      --c-accent: #5b2bd6;
+      --c-accent2: #9c1f7e;
+      --c-surface: #fff;
+      --c-border: #ddd;
+    }
+    .page-bar,
+    .page-foot,
+    .no-print,
+    .skip-link {
+      display: none !important;
+    }
+    .page-main {
+      padding: 0 !important;
+      max-width: none;
+    }
+    .resume {
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+    }
+    .resume a {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+</style>

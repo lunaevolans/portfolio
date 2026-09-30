@@ -1,0 +1,28 @@
+---
+import Page from '../../layouts/Page.astro';
+import { getCollection, render } from 'astro:content';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', (p) => !p.data.draft);
+  return posts.map((p) => ({ params: { slug: p.id }, props: { p } }));
+}
+const { p } = Astro.props;
+const { Content } = await render(p);
+---
+
+<Page title={p.data.title} description={p.data.description} og={`blog/${p.id}`}>
+  <article>
+    <p class="kicker">
+      <time datetime={p.data.date.toISOString()}>{p.data.date.toDateString()}</time> · {p.data.tags.map((t) => `#${t}`).join(' ')}
+    </p>
+    <h1 class="page-title">{p.data.title}</h1>
+    <p class="lede">{p.data.description}</p>
+    <div class="prose">
+      <Content />
+    </div>
+    <a class="back" href={withBase('blog/')}>
+      ← cd ..
+    </a>
+  </article>
+</Page>

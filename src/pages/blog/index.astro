@@ -1,0 +1,31 @@
+---
+import Page from '../../layouts/Page.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/url';
+
+const posts = (await getCollection('blog', (p) => !p.data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Page title="Devlog" description="Writing on Linux, architecture and data science.">
+  <p class="kicker">
+    ~/blog · <a href={withBase('rss.xml')}>rss</a>
+  </p>
+  <h1 class="page-title">Devlog</h1>
+  <p class="lede">Linux, systems architecture, and shipping data science.</p>
+  <ul class="cards">
+    {posts.map((p) => (
+      <li>
+        <a href={withBase(`blog/${p.id}/`)}>
+          <h2>{p.data.title}</h2>
+          <p>{p.data.description}</p>
+          <p class="meta mono muted">
+            <time datetime={p.data.date.toISOString()}>{p.data.date.toISOString().slice(0, 10)}</time>
+            {p.data.tags.map((t) => (
+              <span class="chip">#{t}</span>
+            ))}
+          </p>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Page>

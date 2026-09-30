@@ -1,0 +1,53 @@
+---
+import Base from './Base.astro';
+import '../styles/page.css';
+import { site } from '../config/site';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  description?: string;
+  og?: string;
+  wide?: boolean;
+}
+const { title, description, og, wide } = Astro.props;
+const path = Astro.url.pathname;
+const nav = [
+  { href: withBase('projects/'), label: 'projects' },
+  { href: withBase('blog/'), label: 'blog' },
+  { href: withBase('resume/'), label: 'resume' },
+  { href: withBase('colophon/'), label: 'colophon' },
+];
+---
+
+<Base title={title} description={description} og={og} bodyClass="page">
+  <a class="skip-link" href="#content">
+    Skip to content
+  </a>
+  <header class="page-bar">
+    <a class="page-home mono" href={withBase('')} aria-label="Back to the desktop">
+      <span class="grad-text">
+        {site.user}@{site.hostname}
+      </span>
+      <span class="muted">:~$</span> <span class="page-cta">startx</span>
+    </a>
+    <nav aria-label="Pages">
+      {nav.map((n) => (
+        <a href={n.href} class:list={['mono', { on: path.startsWith(n.href) }]}>
+          {n.label}
+        </a>
+      ))}
+    </nav>
+  </header>
+  <main id="content" class:list={['page-main', { wide }]}>
+    <slot />
+  </main>
+  <footer class="page-foot mono">
+    <span>
+      © {new Date().getFullYear()} {site.name}
+    </span>
+    <span>
+      <a href={withBase('')}>desktop</a> · <a href={withBase('rss.xml')}>rss</a> · <a href={`https://github.com/${site.github}`}>github</a>
+    </span>
+  </footer>
+</Base>

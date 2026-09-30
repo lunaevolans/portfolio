@@ -1,0 +1,58 @@
+---
+import Page from '../../layouts/Page.astro';
+import { getCollection, render } from 'astro:content';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((p) => ({ params: { slug: p.id }, props: { p } }));
+}
+const { p } = Astro.props;
+const { Content } = await render(p);
+---
+
+<Page title={p.data.title} description={p.data.summary} og={`projects/${p.id}`}>
+  <article>
+    <p class="kicker">
+      {p.data.role} · {p.data.year} · {p.data.status}
+    </p>
+    <h1 class="page-title">{p.data.title}</h1>
+    <p class="lede">{p.data.summary}</p>
+    {p.data.metrics.length > 0 && (
+      <dl class="metrics">
+        {p.data.metrics.map((m) => (
+          <div>
+            <dt>{m.label}</dt>
+            <dd class="grad-text">{m.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+    <p>
+      {p.data.stack.map((s) => (
+        <span class="chip">{s}</span>
+      ))}
+    </p>
+    <div class="prose">
+      <Content />
+    </div>
+    <p class="cta-row">
+      {p.data.links.repo && (
+        <a class="btn" href={p.data.links.repo}>
+          Source
+        </a>
+      )}
+      {p.data.links.live && (
+        <a class="btn primary" href={p.data.links.live}>
+          Live
+        </a>
+      )}
+      <a class="btn" href={withBase(`?app=project&slug=${p.id}`)}>
+        Open on the desktop
+      </a>
+    </p>
+    <a class="back" href={withBase('projects/')}>
+      ← cd ..
+    </a>
+  </article>
+</Page>

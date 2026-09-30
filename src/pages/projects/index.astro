@@ -1,0 +1,28 @@
+---
+import Page from '../../layouts/Page.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/url';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Page title="Projects" description="Selected systems, full-stack and data work.">
+  <p class="kicker">~/projects</p>
+  <h1 class="page-title">Selected work</h1>
+  <p class="lede">Platforms, products, and pipelines. Each has a write-up on its trade-offs.</p>
+  <ul class="cards">
+    {projects.map((p) => (
+      <li>
+        <a href={withBase(`projects/${p.id}/`)}>
+          <h2>{p.data.title}</h2>
+          <p>{p.data.summary}</p>
+          <p class="meta">
+            {p.data.stack.slice(0, 5).map((s) => (
+              <span class="chip">{s}</span>
+            ))}
+          </p>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Page>

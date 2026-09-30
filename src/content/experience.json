@@ -1,0 +1,43 @@
+[
+  {
+    "id": "orbital",
+    "company": "Orbital Systems (placeholder)",
+    "role": "Staff Software Engineer · Platform Architecture",
+    "start": "2023-03",
+    "end": null,
+    "location": "Remote",
+    "highlights": [
+      "Architected the Helios event platform (2B+ events/day) and led its migration off synchronous service chains.",
+      "Set up an SLO program across 35 services, cutting pager volume by 71%.",
+      "Mentor to 6 engineers and author of the internal architecture decision record (ADR) process."
+    ],
+    "stack": ["Go", "Kafka", "Kubernetes", "PostgreSQL", "OpenTelemetry"]
+  },
+  {
+    "id": "meridian",
+    "company": "Meridian Analytics (placeholder)",
+    "role": "Senior Full-Stack Engineer → Data Science Lead",
+    "start": "2020-06",
+    "end": "2023-02",
+    "location": "Hybrid",
+    "highlights": [
+      "Built Tessera, a real-time analytics workspace used weekly by 3.4k people.",
+      "Started the forecasting practice. The demand model improved WAPE by 22%.",
+      "Introduced typed API contracts (tRPC + Zod), removing a class of production incidents."
+    ],
+    "stack": ["TypeScript", "React", "ClickHouse", "Python", "LightGBM", "dbt"]
+  },
+  {
+    "id": "fieldnote",
+    "company": "Fieldnote Labs (placeholder)",
+    "role": "Software Engineer",
+    "start": "2017-07",
+    "end": "2020-05",
+    "location": "On-site",
+    "highlights": [
+      "Shipped the Python/Django backend and React front-end for a field-data collection product.",
+      "Moved deploys from hand-built VMs to containerised CI/CD, going from weekly releases to daily ones."
+    ],
+    "stack": ["Python", "Django", "React", "PostgreSQL", "Docker"]
+  }
+]

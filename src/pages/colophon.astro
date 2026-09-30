@@ -1,0 +1,182 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+import { KEYBINDS } from '../lib/wm/keybinds';
+import { themes } from '../lib/themes';
+import { withBase } from '../lib/url';
+
+const layers = [
+  {
+    name: 'Astro (static build)',
+    detail: 'Every route is pre-rendered HTML: the desktop, /projects, /blog, /resume, RSS, sitemap, and OG images generated with satori.',
+  },
+  {
+    name: 'Preact island',
+    detail: 'One hydrated island boots the desktop. State lives in nanostores atoms shared by the WM, terminal, and apps.',
+  },
+  {
+    name: 'Window manager',
+    detail:
+      'A pure dwindle-tiling function (unit tested) computes window rects. Floating, fullscreen, workspaces, and keybinds sit on top.',
+  },
+  {
+    name: 'Shell',
+    detail:
+      'A POSIX-ish parser (quotes, pipes, &&, ||), a virtual filesystem built from content collections, 60+ commands, and tab completion, rendered with xterm.js.',
+  },
+  {
+    name: 'Graphics',
+    detail:
+      'A WebGL fragment shader (OGL) for the wallpaper, d3-force for the architecture canvas, and Observable Plot for the lab charts. All colours come from one palette file.',
+  },
+  { name: 'Python', detail: 'Pyodide (CPython compiled to WebAssembly) lazy-loads on first use for the Lab cell and the `python` REPL.' },
+  {
+    name: 'Quality gates',
+    detail:
+      'Vitest unit tests, Playwright e2e plus axe accessibility scans across all themes, Lighthouse CI budgets, and astro check + ESLint in CI.',
+  },
+];
+---
+
+<Page title="Colophon" description="How this portfolio is built." wide>
+  <p class="kicker">cat /etc/colophon</p>
+  <h1 class="page-title">How this desktop is built</h1>
+  <p class="lede">
+    A portfolio should be a portfolio piece. This one is a static site that pretends to be a Linux desktop. It still ships real HTML for
+    crawlers and screen readers, and it loads each heavy module only when you open the app that needs it.
+  </p>
+
+  <figure class="diagram">
+    <svg
+      viewBox="0 0 900 300"
+      role="img"
+      aria-label="Architecture: content collections flow through the Astro build into static HTML, which hydrates a Preact island hosting the WM, shell and apps; heavy modules are lazy loaded."
+    >
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0L10 5L0 10z" style="fill:var(--c-muted)"></path>
+        </marker>
+      </defs>
+      {[
+        { x: 20, y: 110, t: 'content/*.md', s: 'Zod-typed collections' },
+        { x: 200, y: 110, t: 'astro build', s: 'SSG · OG · RSS · sitemap' },
+        { x: 380, y: 110, t: 'static HTML', s: 'GitHub Pages / CDN' },
+        { x: 560, y: 40, t: 'Preact island', s: 'WM · shell · apps' },
+        { x: 560, y: 180, t: 'lazy chunks', s: 'xterm · d3 · Plot · OGL' },
+        { x: 740, y: 180, t: 'Pyodide', s: 'CPython → wasm (CDN)' },
+        { x: 740, y: 40, t: 'GitHub API', s: 'live stats, cached' },
+      ].map((n) => (
+        <g transform={`translate(${n.x} ${n.y})`}>
+          <rect width="140" height="64" rx="12" style="fill:var(--c-surface);stroke:var(--c-accent)" />
+          <text x="14" y="28" style="fill:var(--c-fg);font:600 14px var(--font-sans)">
+            {n.t}
+          </text>
+          <text x="14" y="47" style="fill:var(--c-muted);font:11px var(--font-mono)">
+            {n.s}
+          </text>
+        </g>
+      ))}
+      {['M160 142 L196 142', 'M340 142 L376 142', 'M520 130 L556 80', 'M520 154 L556 204', 'M700 212 L736 212', 'M700 72 L736 72'].map(
+        (d) => (
+          <path d={d} style="stroke:var(--c-muted);fill:none;stroke-width:1.5" marker-end="url(#a)" />
+        ),
+      )}
+    </svg>
+  </figure>
+
+  <dl class="layers">
+    {layers.map((l) => (
+      <div>
+        <dt>{l.name}</dt>
+        <dd>{l.detail}</dd>
+      </div>
+    ))}
+  </dl>
+
+  <h2>Performance budget</h2>
+  <p>
+    The first paint needs only the HTML, CSS, fonts, and the desktop island. The terminal, force graph, charts, shader, and Python are
+    separate chunks. The wallpaper renders at ≤1.5× DPR, pauses when the tab is hidden, and becomes a single static frame under{' '}
+    <code>prefers-reduced-motion</code>. CI fails the build if Lighthouse drops below its thresholds.
+  </p>
+
+  <h2>Themes</h2>
+  <p>
+    {Object.values(themes).map((t) => (
+      <span class="chip">{t.name}</span>
+    ))}
+  </p>
+  <p class="muted">
+    One palette file drives CSS variables, the shader uniforms, the xterm colours, and the chart colours. Try <code>theme nord</code> in the
+    terminal.
+  </p>
+
+  <h2>Keybinds</h2>
+  <dl class="layers compact">
+    {KEYBINDS.map((k) => (
+      <div>
+        <dt class="mono">{k.keys}</dt>
+        <dd>{k.action}</dd>
+      </div>
+    ))}
+  </dl>
+
+  <p class="cta-row">
+    <a class="btn primary" href={withBase('')}>
+      Boot the desktop
+    </a>
+    <a class="btn" href={`https://github.com/${site.github}`}>
+      Source on GitHub
+    </a>
+  </p>
+</Page>
+
+<style>
+  .diagram {
+    margin: 24px 0;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--c-border);
+    background: color-mix(in oklab, var(--c-surface) 70%, transparent);
+    overflow-x: auto;
+  }
+  .diagram svg {
+    min-width: 640px;
+    width: 100%;
+    height: auto;
+  }
+  .layers {
+    display: grid;
+    gap: 10px;
+    margin: 0 0 24px;
+  }
+  .layers div {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+  }
+  .layers.compact div {
+    padding: 6px 12px;
+  }
+  .layers dt {
+    font-weight: 700;
+    color: var(--c-accent);
+  }
+  .layers dd {
+    margin: 0;
+    color: var(--c-muted);
+  }
+  h2 {
+    margin-top: 30px;
+  }
+  @media (max-width: 640px) {
+    .layers div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+</style>
